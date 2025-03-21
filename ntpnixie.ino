@@ -137,6 +137,12 @@ void updateRTCFromNTP() {
     int second = formattedDate.substring(17, 19).toInt();
     int dayOfWeek = timeClient.getDay();  // 0=Sunday, 6=Saturday
 
+    // Sanity Check Date (NTP Sync fail will set date to 1970)
+    if(year<1980){
+      updateRTCFromNTP();
+      Serial.println("Trying NTP Again");
+    }
+
     // Apply Eastern Time (UTC-5 Standard / UTC-4 DST)
     bool isDST = isDaylightSavingTime(year, month, day, hour);
     int offset = isDST ? UTCOffsetDaylight : UTCOffsetStandard;  // Convert UTC to Eastern Time
@@ -197,6 +203,9 @@ void printRTCTime() {
     else if(hour>12){
       hrs = "0" + String(hour-12);
       }
+    else if(hour==0){
+      hrs = "12";
+    }
     else if(hour<10){
       hrs = "0" + String(hour);
       }
