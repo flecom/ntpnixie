@@ -19,4 +19,6 @@ Adafruit-NeoPixel
 
 https://github.com/adafruit/Adafruit_NeoPixel/
 
-Please note I made this for my clock and it does what I wanted it to do, I have no idea what I am doing, this code is entirely as-is... it's enitrely possible I am actually a cat pretending to be a human, you will never know
+Please note I made this for my clock and it does what I wanted it to do, I have no idea what I am doing, this code is entirely as-is and probably terrible... 
+
+it's enitrely possible I am actually a cat pretending to be a human, you will never know
