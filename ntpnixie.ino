@@ -1,3 +1,6 @@
+//MIT License - Copyright (c) 2026 FLECOM
+//See LICENSE file for details.
+
 #include <Wire.h>
 #include <WiFi.h>
 #include <NTPClient.h>
