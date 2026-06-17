@@ -17,8 +17,8 @@ WiFiUDP ntpUDP;
 NTPClient timeClient(ntpUDP, "pool.ntp.org", 0, 60000);
 
 // Network credentials
-const char* ssid = "combination to my luggage";
-const char* password = "1 2 3 4 5";
+char ssid[] = "combination to my luggage";
+char password[] = "1 2 3 4 5";
 
 // NTP Update variables
 unsigned long lastNTPSync = 0;                  // Keeps track of the last time we queried the NTP server
