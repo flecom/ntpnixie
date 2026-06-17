@@ -23,6 +23,10 @@ char password[] = "1 2 3 4 5";
 // NTP Update variables
 unsigned long lastNTPSync = 0;                  // Keeps track of the last time we queried the NTP server
 const unsigned long ntpSyncInterval = 3600000;  // 1 hour
+unsigned long wifiAttemptStart = 0;
+bool       wifiWaiting       = false;   //keep track if we are waiting on failed wifi attempts 
+const unsigned long WIFI_TIMEOUT_MS = 30UL * 1000UL;   //30 s timeout
+const unsigned long WIFI_RETRY_INTERVAL = 500;       //ms between Wi‑Fi status checks
 
 // Array for nixie digits
 //                            0      1      2      3      4      5      6      7      8       9
@@ -114,11 +118,35 @@ void loop() {
   
     delay(1000);
 
-    // Sync with NTP every hour
+    //Sync with NTP every hour after checking WIFI is connected and we have a valid NTP sync
     if (millis() - lastNTPSync >= ntpSyncInterval) {
-        timeClient.update();
-        updateRTCFromNTP();
-        lastNTPSync = millis();
+        if (WiFi.status() != WL_CONNECTED) {
+            if (!wifiWaiting) {                //first time we notice it's down
+                Serial.println("Wi‑Fi down – trying to reconnect");
+                WiFi.begin(ssid, password);
+                wifiAttemptStart = millis();
+                wifiWaiting = true;
+            }
+
+            //give up after the timeout but keep loop going
+            if (millis() - wifiAttemptStart > WIFI_TIMEOUT_MS) {
+                Serial.println("Wi‑Fi still down after timeout – will retry next hour");
+                lastNTPSync = millis();        // skip this hour
+                wifiWaiting = false;
+            }
+            //keep looping – display continues to update
+            return;
+        }
+
+        //Wi‑Fi is up again – reset the flag and continue with NTP
+        wifiWaiting = false;
+        timeClient.begin();          // re‑open UDP socket after a reset
+        if (timeClient.update()) {
+            updateRTCFromNTP();
+            lastNTPSync = millis();
+        } else {
+            Serial.println("NTP update failed");
+        }
     }
 }
 
